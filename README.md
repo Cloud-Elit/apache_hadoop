@@ -1,5 +1,5 @@
-﻿<a name="_toc86414353"></a><a name="_toc90890748"></a><a name="_toc90894787"></a><a name="_toc90895205"></a><a name="_toc117089976"></a>Hadoop, HDFS, MapReduce, YARN
-1. ####### **Apache Hadoop**
+# Hadoop, HDFS, MapReduce, YARN
+## Apache Hadoop
 Apache Hadoop[^1] est un cadre libre écrit en Java pour le stockage et le traitement distribués de grandes volumétries de données sur des clusters d’ordinateurs. Ces clusters sont construits à partir de matériel de base constitué de simples machines physiques ou virtuelles. Tous les modules de Hadoop sont conçus avec l’hypothèse fondamentale que les pannes matérielles sont courantes et doivent être gérées de façon automatique. Hadoop est aujourd’hui l’outil de-facto utilisé pour l’informatique distribuée. Les idées de bases sur lesquelles a été fondé Hadoop ont été tirées du Système de Fichiers Google GFS (Google File System) tel que présenté dans cet article [Ghemawat, 03] et l’article MapReduce [Dean, 04].
 
 L’avantage clé d’Apache Hadoop est sa conception pour l’évolutivité, c’est-à-dire qu’il est facile d’ajouter des nouvelles machines pour mettre à l’échelle un cluster existant en termes de stockage et de puissance de calcul. En outre, Hadoop part du principe que des machines uniques dans le Cluster peuvent tomber en panne et que leur travail doit être effectué par d’autres machines, au sein du cluster, sans aucune intervention humaine. De cette façon, des clusters énormes, fiables et hautement disponibles peuvent être construits sans investir dans du matériel coûteux.
@@ -12,7 +12,7 @@ Le projet Apache Hadoop comprend les modules suivants :
 - **YARN** : un gestionnaire des ressources Hadoop.
 
 Les modules énumérés ci-dessus forment le noyau d’Apache Hadoop, tandis que l’écosystème Hadoop contient de nombreux projets tels que HBase, Hive, Spark et bien d’autres que nous passerons en revue par la suite.
-1. ####### <a name="_toc86414354"></a><a name="_toc90895206"></a>**HDFS**
+## HDFS
 HDFS (Hadoop Distributed File System) est, comme son nom l’indique, un système de fichiers distribué. Il permet d’accéder aux fichiers et aux répertoires stockés sur différentes machines du réseau de manière transparente pour l’utilisateur. HDFS, contrairement à d’autres solutions similaires, se distingue par quelques hypothèses :
 
 - La défaillance matérielle est davantage considérée comme une norme plus qu’une exception. Au lieu de s’appuyer sur des systèmes matériels coûteux et tolérants aux pannes, le matériel de base est choisi. Cela réduit non seulement l’investissement pour la configuration de l’ensemble du cluster, mais permet également le remplacement facile du matériel défaillant.
@@ -20,9 +20,11 @@ HDFS (Hadoop Distributed File System) est, comme son nom l’indique, un systèm
 - Les applications utilisant Hadoop traitent des ensembles de données volumineux structurés en fichiers volumineux. Par conséquent, Hadoop est optimisé pour gérer des gros fichiers plutôt qu’une grande quantité de petits fichiers.
 - La plupart des applications Big Data écrivent les données une fois et les lisent souvent (fichiers journaux, images, etc.). Par conséquent, Hadoop part du principe qu’un fichier est créé une fois et n’est jamais mis à jour. Cela simplifie le modèle de cohérence et permet un débit élevé.
 
-L’architecture HDFS simplifiée est illustrée dans la Figure 1.3. 
-
-*Figure 1.3. Architecture HDFS*
+L’architecture HDFS simplifiée est illustrée dans la Figure 1. 
+<p align="center">
+  <img src="https://github.com/Cloud-Elit/apache_hadoop/assets/142179779/5512370e-adf7-49c1-a871-1d613c09c5b5" /><br/>
+  <i>Figure 1. Architecture HDFS</i>
+</p>
 
 Dans HDFS, il existe deux types de serveurs : NameNodes et DataNodes. Le NameNode sert toutes les opérations de métadonnées sur le système de fichiers, telles que la création, l’ouverture, la fermeture ou le renommage de fichiers et de répertoires. Par conséquent, c’est le NameNode qui gère la structure complète du système de fichiers. Concrètement, un fichier est divisé en un ou plusieurs blocs de données qui sont par la suite stockés sur un ou plusieurs DataNodes. Les DataNodes sont rangés dans des racks[^3]. La connaissance des blocs de données qui forment un fichier spécifique réside sur le NameNode. Un client HDFS récupère auprès du NameNode la liste des blocs de données constituant un fichier et ensuite contacte les DataNodes pour lire ou écrire des données.
 
@@ -35,19 +37,20 @@ La réplication des données est un élément clé de la tolérance aux pannes d
 Les DataNodes stockent les blocs dans leurs systèmes de fichiers locaux. Au démarrage, un DataNode analyse la structure de son système de fichiers local et envoie ensuite une liste de tous les blocs qu’il stocke au NameNode (le Block-Report). Chaque DataNode envoie à intervalles de temps réguliers des signaux de pulsation (heartbeat signal) au NameNode.
 
 HDFS est robuste contre un certain nombre de types de défaillance :
-
 - **Échec du NameNode** : comme le NameNode est un point de défaillance unique, il est essentiel que ses données (EditLog et FsImage) puissent être restaurées. HDFS peut être configuré pour permettre de stocker plus d’une copie des fichiers EditLog et FsImage. Cela peut réduire la vitesse à laquelle le NameNode traite les opérations, mais néanmoins garantit que plusieurs copies des fichiers critiques existent.
 - **Échec du DataNode** : si le NameNode ne reçoit aucune pulsation pendant une durée spécifique d’un DataNode, le nœud est considéré comme "mort" et aucune autre opération n’est planifiée pour lui. Un DataNode mort diminue le facteur de réplication des blocs de données qu’il stocke. Pour éviter la perte de données, le NameNode peut démarrer de nouveaux processus de réplication pour augmenter le facteur de réplication pour ces blocs.
-1. ####### <a name="_toc86414355"></a><a name="_toc90895207"></a>**MapReduce**
+## MapReduce
 Alors que HDFS est le système de fichiers distribué pour stocker les données dans Hadoop, MapReduce est le cadre permettant d’analyser ces données. MapReduce est généralement utilisé dans les traitements par lots. Il est hautement évolutif et fiable et est basé sur le principe de « diviser pour régner » qui fournit une tolérance aux pannes et une redondance intégrées. Le principe est de diviser un gros problème en une collection de petits problèmes qui peuvent être résolus rapidement à l’unité. Ce cadre n’exige pas que les données d’entrée soient conformes à un modèle de données particulier ; il peut donc être utilisé pour traiter des ensembles de données non-structurées. Un jeu de données est divisé en plusieurs parties plus petites et des opérations sont effectuées sur chaque partie indépendamment et en parallèle. Les résultats de toutes les opérations sont ensuite résumés pour arriver à la réponse.
 
 MapReduce dispense les développeurs de la gestion des aspects de distribution du travail sur les nœuds du cluster, de récupération des données sur HDFS, de développement spécifique à la couche réseau pour la communication entre les nœuds, etc. Un autre avantage de MapReduce est sa tolérance aux pannes ; si le NameNode remarque qu’un DataNode, à qui il a assigné une tâche, est silencieux pendant un intervalle de temps plus long que prévu, il le considère comme "mort" et assigne la tâche à un autre DataNode. Ceci crée une résilience et facilite le lancement de cette structure logicielle sur des serveurs peu coûteux. Le reste de cette section est basé en grande partie sur le livre "*Big Data Fundamentals - Concepts, Drivers & Techniques*" de Thomas Erl et al. [Erl, 16] qui décrit en détails le fonctionnement interne de MapReduce.
 
 Le moteur de traitement MapReduce fonctionne différemment du paradigme de traitement de données traditionnel qui nécessite le déplacement des données du nœud de stockage vers le nœud de traitement. Cette approche fonctionne bien pour les ensembles de données de petites tailles, mais, avec des ensembles de données volumineux, le déplacement des données peut durer très longtemps. Avec MapReduce, c’est l’algorithme de traitement des données qui est déplacé vers les nœuds qui stockent les données. Cela permet non seulement d’économiser la bande passante du réseau, mais se traduit également par une réduction importante du temps de traitement pour les grands ensembles de données, car le traitement de plus petits morceaux de données en parallèle est beaucoup plus rapide.
 
-Un "Job MapReduce" correspond à l’exécution d’un traitement spécifique dans le moteur de traitement MapReduce. Le Job MapReduce est composée de deux tâches (ou fonctions) : Map et Reduce. Chacune de ces tâches est composée d’un ensemble de sous-tâches comme le montre la Figure 1.4.
-
-*Figure 1.4. Tâches Map et Reduce [Erl, 16]*
+Un "Job MapReduce" correspond à l’exécution d’un traitement spécifique dans le moteur de traitement MapReduce. Le Job MapReduce est composée de deux tâches (ou fonctions) : Map et Reduce. Chacune de ces tâches est composée d’un ensemble de sous-tâches comme le montre la Figure 2.
+<p align="center">
+  <img src="https://github.com/Cloud-Elit/apache_hadoop/assets/142179779/466dc4b8-80e2-40c8-aa5c-73f2e9096b1d" /><br/>
+  <i>Figure 2. Tâches Map et Reduce [Erl, 16]</i>
+</p>
 
 La première étape de MapReduce est connue sous le nom "Map", au cours de laquelle le fichier de jeu de données est divisé en plusieurs divisions plus petites. Chaque division est composée d’un ensemble d’enregistrements constitutifs sous forme de paires clé-valeur. La clé représente la position ordinale de l’enregistrement, et la valeur contient l’enregistrement lui-même. Les paires clé-valeur analysées pour chaque division sont ensuite envoyées à une fonction de mappage (ou mappeur) qui exécute la logique définie par le développeur (ce qu’il souhaite faire des données). Chaque division contient généralement plusieurs paires clé-valeur, et la fonction de mappage est exécutée une fois pour chaque paire clé-valeur de la division. La fonction de mappage génère en sortie une nouvelle paire clé-valeur pour chaque division. La clé de sortie peut être la même que la clé d’entrée ou une valeur de sous-chaîne de la valeur d’entrée, ou un autre objet sérialisable défini par l’utilisateur. De même, la valeur de sortie peut être la même que la valeur d’entrée ou une valeur de sous-chaîne de la valeur d’entrée, ou un autre objet sérialisable défini par l’utilisateur. Lorsque tous les enregistrements du fractionnement ont été traités, la sortie est une liste de paires clé-valeur où plusieurs paires clé-valeur peuvent exister pour la même clé. Il convient de noter que pour une paire clé-valeur d’entrée, la fonction de mappage peut ne produire aucune paire clé-valeur de sortie comme elle peut en générer plusieurs.
 
@@ -64,17 +67,19 @@ Le cadre MapReduce, de la version 1.0 de Hadoop, a introduit deux processus esse
 Le fait qu’il n’y a qu’une seule instance de JobTracker dans la version 1.0 de Hadoop a conduit au problème que toute l’exécution de MapReduce peut échouer en cas de panne au niveau du JobTracker (il s’agit d’un point unique de défaillance de MapReduce). En plus, n’avoir qu’une seule instance du JobTracker limite l’évolutivité pour les grands clusters. En outre, le concept des slots prédéfinis pour les fonctions Map et Reduce a également causé des problèmes de ressources lorsque tous les slots de Map sont utilisés alors que des slots Reduce sont toujours disponibles et vice versa. A cause de tous ces problèmes, il n’était pas possible de réutiliser l’infrastructure MapReduce pour d’autres types de calculs comme les tâches en temps réel. Même si MapReduce est un cadre de traitement par lots, les applications qui traitent des grands ensembles de données, et qui doivent informer immédiatement les utilisateurs des résultats, ne peuvent pas être implémentées avec cette version de Hadoop. Outre le fait que MapReduce 1.0 n’offrait pas de fourniture en temps réel des résultats de calcul, tous les autres types d’applications souhaitant effectuer des calculs sur les données HDFS devaient être implémentés en tant que tâches Map et Reduce, ce qui n’était pas toujours possible.
 
 Pour résoudre ces problèmes, YARN a été introduit dans Hadoop, avec la version 2.0, en tant que gestionnaire de ressources. YARN n’utilise plus de slots pour gérer les ressources. En revanche, les nœuds ont des "ressources" comme la mémoire vive et le nombre de cœurs du processeur qui peuvent être allouées aux applications.
-1. ####### <a name="_toc86414356"></a><a name="_toc90895208"></a>**YARN**
-YARN (Yet Another Resource Negotiator) a été introduit avec la version 2.0 de Hadoop en tant que gestionnaire de ressources. La Figure 1.5 illustre l’architecture de YARN.
-
-*Figure 1.5. Architecture de YARN*
+## YARN
+YARN (Yet Another Resource Negotiator) a été introduit avec la version 2.0 de Hadoop en tant que gestionnaire de ressources. La Figure 3 illustre l’architecture de YARN.
+<p align="center">
+  <img src="https://github.com/Cloud-Elit/apache_hadoop/assets/142179779/ba0337cc-a12a-4324-9edc-40832c691c8c" /><br/>
+  <i>Figure 3. Architecture de YARN</i>
+</p>
 
 Le cœur de YARN est le Gestionnaire de Ressources (Resource Manager) qui s’exécute sur le nœud maître et agit comme un planificateur de ressources global. Il arbitre également les ressources entre les applications concurrentes. Les Gestionnaires de Nœuds (Node Managers) s’exécutent sur des nœuds esclaves et communiquent avec le Gestionnaire de Ressources. Chaque Gestionnaire de Nœud est responsable de la création de conteneurs dans lesquels les applications s’exécutent, surveille leur utilisation du processeur et de la mémoire et les signale au Gestionnaire de Ressources. Chaque application a son propre Maître d’Application (Application Master) qui s’exécute dans un conteneur et négocie les ressources avec le Gestionnaire de Ressources ; il travaille avec le Gestionnaire de Nœud pour exécuter et surveiller les tâches sur les conteneurs.
 
 L’implémentation MapReduce de Hadoop 2.0 est livrée avec un Maître d’Application, nommée MRAppMaster, qui demande des conteneurs pour l’exécution des tâches Map au Gestionnaire de Ressources. A la réception des identifiants des conteneurs, le MRAppMaster y exécute les tâches Map. A la fin d’exécution de ces tâches, il demande de nouveaux des conteneurs pour l’exécution des tâches Reduce et démarre leur exécution sur les conteneurs fournis.
 
 Si l’exécution d’une tâche échoue, elle est redémarrée par le Maître d’Application. En cas d’échec du Maître d’Application, le Gestionnaire de Ressources tentera de redémarrer l’ensemble de l’application (jusqu’à deux fois par défaut). Par conséquent, le Maître d’Application peut signaler s’il prend en charge la récupération des tâches. Dans ce cas, il reçoit l’état précédent auprès du Gestionnaire de Ressources et ne redémarre que les tâches incomplètes. Si un Gestionnaire de Nœud échoue, c’est-à-dire que le Gestionnaire de Ressources ne reçoit aucune pulsation de sa part, il est supprimé de la liste des nœuds actifs et toutes ses tâches sont traitées comme ayant échoué. Contrairement à la version 1.0 de Hadoop, le Gestionnaire de Ressources peut être configuré pour la haute disponibilité.
-####### **Bibliographie**
+## Bibliographie
 
 
 [^1]: https://hadoop.apache.org/
