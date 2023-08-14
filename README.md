@@ -80,7 +80,9 @@ L’implémentation MapReduce de Hadoop 2.0 est livrée avec un Maître d’Appl
 
 Si l’exécution d’une tâche échoue, elle est redémarrée par le Maître d’Application. En cas d’échec du Maître d’Application, le Gestionnaire de Ressources tentera de redémarrer l’ensemble de l’application (jusqu’à deux fois par défaut). Par conséquent, le Maître d’Application peut signaler s’il prend en charge la récupération des tâches. Dans ce cas, il reçoit l’état précédent auprès du Gestionnaire de Ressources et ne redémarre que les tâches incomplètes. Si un Gestionnaire de Nœud échoue, c’est-à-dire que le Gestionnaire de Ressources ne reçoit aucune pulsation de sa part, il est supprimé de la liste des nœuds actifs et toutes ses tâches sont traitées comme ayant échoué. Contrairement à la version 1.0 de Hadoop, le Gestionnaire de Ressources peut être configuré pour la haute disponibilité.
 ## Bibliographie
-
+- [Dean, 04] Dean, Jeffrey & Ghemawat, Sanjay. (2004). MapReduce: Simplified Data Processing on Large Clusters. Communications of the ACM. 51. 137-150. DOI: 10.1145/1327452.1327492. 
+- [Erl, 16] Erl, Thomas & Khattak, Wajid & Buhler, Paul. (2016). Big Data Fundamentals - Concepts, Drivers & Techniques. Arcitura Education Inc. ISBN: 978-0-13-429107-9.
+- [Ghemawat, 03] Ghemawat, Sanjay & Gobioff, Howard & Leung, Shun-Tak. (2003). The Google File System. ACM SIGOPS Operating Systems Review. 37. 29-43. DOI: 10.1145/945445.945450. 
 
 [^1]: https://hadoop.apache.org/
 [^2]: POSIX (Portable Operating System Interface) est un ensemble de normes d’interfaces spécifiées par la société informatique IEEE et basées sur UNIX. POSIX fournit la définition des interfaces de programmation d’applications, des interfaces utilitaires associées et des Shells de ligne de commande pour la compatibilité des différentes applications et logiciels avec différents systèmes d’exploitation et variantes d’UNIX.
